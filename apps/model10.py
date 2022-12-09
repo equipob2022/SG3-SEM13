@@ -79,7 +79,8 @@ def app():
     max_depth = st.number_input('Profundidad máxima', min_value=1, max_value=20, value=5, step=1)
     min_child_weight = st.number_input('Peso mínimo del hijo', min_value=1, max_value=10, value=2, step=1)
     learning_rate = st.number_input('Tasa de aprendizaje', min_value=0.01, max_value=1.0, value=0.3, step=0.01)
-
+    #hacer una barra de progreso
+    bar = st.progress(0)
     # crear el modelo
     model = xgb.XGBRegressor(
         n_estimators = n_estimators,
@@ -87,6 +88,7 @@ def app():
         min_child_weight = min_child_weight,
         learning_rate = learning_rate,
     )
+    bar.progress(10)
 
     model.fit(
         x_train,
@@ -95,12 +97,14 @@ def app():
         early_stopping_rounds = 20,
         verbose = False
     )
+    bar.progress(50)
 
     #mostramos la importancia de las variables
     st.subheader('Importancia de las variables')
     #imprimir como una tabla la importancia de las variables
     st.write(pd.DataFrame(model.feature_importances_, index=x_train.columns, columns=["Importancia"]).sort_values(by="Importancia", ascending=False))
 
+    bar.progress(100)
 
     # evaluar el modelo
     # Crear un dataframe final para verificar las predicciones
@@ -159,13 +163,16 @@ def app():
         np.abs(df_pred["Adj Close"] - df_pred["Adj Close_Pred"]) / df_pred["Adj Close"]
     ).mean() * 100
 
-    # Mostrar los errores en un gráfico de matplotlib y en una tabla de streamlit
-    st.subheader('Errores')
-    fig, ax = plt.subplots()
-    ax.bar(["MSE", "MAE", "MAPE"], [mse, mae, mape])
-    ax.set_ylabel("Error")
-    ax.set_title("Errores de predicción")
-    st.pyplot(fig)
+    # Mostrar los errores en un gráfico 
+    st.subheader('Gráfico de errores')
+    # Graficar los errores
+    title = "Errores de predicción de precios de cierre de "+ user_input
+    fig = px.bar(
+        x = ["MSE", "MAE", "MAPE"],
+        y = [mse, mae, mape],
+        title = title
+    )
+    st.plotly_chart(fig)
 
     # Mostrar los errores en una tabla de streamlit
     st.subheader('Metricas de error')

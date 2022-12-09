@@ -18,3 +18,4 @@ def app():
     st.write('Torres Talaverano, Luz Elena - 19200294')
     st.write('Zenobio Pariasca, Edgar Alonso - 19200245')
     
+    st.write(st.__version__)
