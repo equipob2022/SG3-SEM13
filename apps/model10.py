@@ -72,8 +72,8 @@ def app():
 
     # crear el modelo
     model = xgb.XGBRegressor(
-    n_estimators = 10000,
-    max_depth = 15,
+    n_estimators = 1000,
+    max_depth = 5,
     min_child_weight = 2,
     learning_rate = 0.01
     )
