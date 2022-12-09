@@ -138,5 +138,5 @@ def app():
     ax2.set_title('Correlación de caracteristicas = %.3f'%corr[sA][sB])
     ax2.legend(loc='upper left',prop={'size':8})
     plt.setp(ax2.get_xticklabels(), rotation=70)
-    plt.subheader("Correlación de caracteristicas")
+    st.subheader("Correlación de caracteristicas")
     st.pyplot(f)

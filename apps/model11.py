@@ -1,5 +1,4 @@
 import streamlit as st
-import talib
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -10,7 +9,7 @@ from sklearn.model_selection import ParameterGrid
 from sklearn import metrics
 
 def app():
-    st.title('Random Forest - Cambio de Dogecoin')
+    st.title('Random Forest Prediccion del Doge coin')
 
     start = st.date_input('Inicio',value=pd.to_datetime('2017-11-28'))
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
@@ -22,6 +21,8 @@ def app():
    
     df = datas.DataReader(user_input, 'yahoo', start, end)
 
+    #mostra los datos
+    st.write(df)
 
     st.title('Predicción de tendencia de acciones')
 
@@ -36,17 +37,15 @@ def app():
     plt.xlabel("Adjusted close 1 day percent change")
     st.pyplot(fig)
 
+    ## correlacion entre las variables en un mapa de calor
+    st.subheader('Correlación entre las variables')
+    fig = px.imshow(df.corr())
+    st.plotly_chart(fig)
+
     st.subheader('Feature engineering')
 
-    #Creamos una lista vacia de caracteristicas
-    feature_names = []
-    #Calculo en loop de los MA y RSI en los periodos
-    for n in [14, 30, 50, 200]:
-        df['ma' + str(n)] = talib.SMA(df['Adj Close'].values, timeperiod=n)
-        df['rsi' + str(n)] = talib.RSI(df['Adj Close'].values, timeperiod=n)
-    
-    #Agregando estas caracteristicas a la lista
-    feature_names = feature_names + ['ma' + str(n), 'rsi' + str(n)]
+    #Creamos una lista de caracteristicas
+    feature_names = ['Open','High','Low','Close','Adj Close','Volume']
 
     df['Volume_1d_change'] = df['Volume'].pct_change()
 
@@ -72,20 +71,33 @@ def app():
     X_test = X[train_size:]
     y_test = y[train_size:]
 
+    #hacer input de los parametros
+    st.subheader('Parametros del modelo')
+    n_estimators = st.number_input('Numero de arboles', min_value=1, max_value=1000, value=100, step=1)
+    max_depth = st.number_input('Profundidad maxima', min_value=1, max_value=100, value=5, step=1)
+    random_state = st.number_input('Semilla', min_value=1, max_value=100, value=2, step=1)
+
+    #definimos el modelo
     rf_model = RandomForestRegressor(
-        n_estimators=200, 
-        max_depth=3, 
-        max_features=8, \
-        random_state=42)
+        n_estimators=n_estimators, 
+        max_depth=max_depth, 
+        random_state=random_state
+    )
+
     rf_model.fit(X_train, y_train)
 
     y_pred = rf_model.predict(X_test)
+    # crear un dataframe con los valores reales , los predichos y la fecha
+    st.subheader('Valores reales vs predichos')
+    df_pred = pd.DataFrame({'y_test':y_test, 'y_pred':y_pred}, index=y_test.index)
+    st.write(df_pred)
 
+
+    #hacer un grafico de la prediccion vs el valor real
     st.subheader('Prediccion con Random Forest')
-
-    y_pred_series = pd.Series(y_pred, index=y_test.index)
-    fig = px.line(y_pred_series)
+    fig = px.line(df_pred, title='Prediccion con Random Forest')
     st.plotly_chart(fig)
+
 
     ## Métricas
     MAE=metrics.mean_absolute_error(y_test, y_pred)
@@ -115,5 +127,7 @@ def app():
     )
     st.plotly_chart(fig)
 
+    
+    
     
     
