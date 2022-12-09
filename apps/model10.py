@@ -98,8 +98,8 @@ def app():
 
     #mostramos la importancia de las variables
     st.subheader('Importancia de las variables')
-    # Revisar la importancia de las variables
-    st.plotly_chart(xgb.plot_importance(model, height=0.9).figure)
+    #imprimir como texto la importancia de las variables
+    st.write(model.feature_importances_)
 
 
     # evaluar el modelo
