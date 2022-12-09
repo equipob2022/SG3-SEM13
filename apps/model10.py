@@ -35,7 +35,7 @@ def app():
 
     #hacemos un grafico de la serie de tiempo
     st.subheader('Serie de tiempo de la cotización bursátil de '+user_input)
-    fig = px.line(df, x="Date", y="Close", title='Precio de cierre de Dogecoin')
+    fig = px.line(df, x="Date", y="Close", title='Precio de cierre de '+ user_input)
     st.plotly_chart(fig)
 
     ## correlacion entre las variables en un mapa de calor
