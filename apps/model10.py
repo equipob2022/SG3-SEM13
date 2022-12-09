@@ -98,8 +98,8 @@ def app():
 
     #mostramos la importancia de las variables
     st.subheader('Importancia de las variables')
-    #imprimir como texto la importancia de las variables
-    st.write(model.feature_importances_)
+    #imprimir como una tabla la importancia de las variables
+    st.write(pd.DataFrame(model.feature_importances_, index=x_train.columns, columns=["Importancia"]).sort_values(by="Importancia", ascending=False))
 
 
     # evaluar el modelo
