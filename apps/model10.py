@@ -17,6 +17,9 @@ def app():
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
     
     st.title('Predicción de tendencia de acciones')
+    st.write('Este modelo utiliza el algoritmo XGBoost para predecir la tendencia de las acciones')
+    #describir el modelo y sus caracteristicas
+    st.subheader('Descripción del modelo')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
     startStr = start.strftime('%Y-%m-%d')
@@ -69,13 +72,20 @@ def app():
     y_train = train_df[label]
     x_eval = eval_df[features]
     y_eval = eval_df[label]
+    # intentar modificar los parametros del modelo
+    #input de los parametros del modelo
+    st.subheader('Parámetros del modelo')
+    n_estimators = st.number_input('Número de estimadores', min_value=100, max_value=10000, value=300, step=100)
+    max_depth = st.number_input('Profundidad máxima', min_value=1, max_value=20, value=5, step=1)
+    min_child_weight = st.number_input('Peso mínimo del hijo', min_value=1, max_value=10, value=2, step=1)
+    learning_rate = st.number_input('Tasa de aprendizaje', min_value=0.01, max_value=1.0, value=0.3, step=0.01)
 
     # crear el modelo
     model = xgb.XGBRegressor(
-    n_estimators = 10000,
-    max_depth = 15,
-    min_child_weight = 2,
-    learning_rate = 0.01
+        n_estimators = n_estimators,
+        max_depth = max_depth,
+        min_child_weight = min_child_weight,
+        learning_rate = learning_rate,
     )
 
     model.fit(

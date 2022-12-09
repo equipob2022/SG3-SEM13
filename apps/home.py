@@ -1,7 +1,7 @@
 import streamlit as st
 
 def app():
-    st.header('Companía Tecnológica Nintendo Co., NTDOY')
+
 
     st.subheader('INTEGRANTES:')   
     
