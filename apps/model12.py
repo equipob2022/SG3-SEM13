@@ -48,8 +48,6 @@ def app():
     st.plotly_chart(fig)
 
     st.write(df.describe())
-    ticker = yf.Ticker("NTDOY")
-    data = ticker.history(period="max")
     # Use PCA to reduce the number of features in the dataset
     st.subheader("PCA")
     returns = df
