@@ -20,10 +20,8 @@ def app():
     start = st.date_input('Start' , value=pd.to_datetime('2000-01-01'))
     end = st.date_input('End' , value=pd.to_datetime('today'))
 
-    ticker= "NTDOY "
-    stock_data = yf.download(ticker, start="2000-01-01", end="2022-12-8")   
 
-    user_input = st.text_input('Introducir cotización bursátil' , 'NTDOY',disabled=False)
+    user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
 
     df = datas.DataReader(user_input, 'yahoo', start, end)
     st.subheader('Datos del 2000 al 2022') 
@@ -61,11 +59,19 @@ def app():
     st.dataframe(returns.head(10))
     # Perform PCA on the returns
     pca = PCA()
-    pca_data=pca.fit(returns)
-    plt.plot(pca.components_)
-    st.pyplot()
+    pca_data =pca.fit(returns)
+    # Plot the cumulative sum of the explained variance ratio in pyplot
+    st.subheader("Explained Variance Ratio")
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(np.cumsum(pca.explained_variance_ratio_))
+    ax.set_xlabel("Number of Components")
+    ax.set_ylabel("Cumulative Explained Variance")
+    st.pyplot(fig)
+
     # Compute the hierarchical clusters
     clusters = linkage(pca.components_, method="ward")
+
 
     # Plot the dendrogram of the hierarchical clusters
 
@@ -73,11 +79,15 @@ def app():
     stddev = row.std()
     # calculate the Sharpe ratio
     sharpe = returns["valor"] / stddev 
-    # plot the Sharpe ratio
-    plt.plot(returns, sharpe)
-    plt.xlabel('Portfolio return')
-    plt.ylabel('Sharpe ratio')
-    st.pyplot()
+    # plot the Sharpe ratio in a figure
+    st.subheader("Sharpe Ratio")
+    fig = plt.figure()
+    ax = sharpe.plot()
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Sharpe Ratio")
+    ax.set_title("Sharpe Ratio for " + "Valor")
+    st.pyplot(fig)
+
     st.subheader("Matriz de correlación")
     corr = returns.corr()
     size = 7
@@ -85,7 +95,7 @@ def app():
     ax.matshow(corr,cmap=cm.get_cmap('coolwarm'), vmin=0,vmax=1)
     plt.xticks(range(len(corr.columns)), corr.columns, rotation='vertical', fontsize=8);
     plt.yticks(range(len(corr.columns)), corr.columns, fontsize=8);
-    st.pyplot()
+    st.pyplot(fig)
     Z = linkage(corr, 'average')
     c, coph_dists = cophenet(Z, pdist(corr))
     plt.figure(figsize=(25, 10))
@@ -103,7 +113,9 @@ def app():
     pylab.yticks(fontsize=ticksize)
     pylab.xticks(rotation=-90, fontsize=ticksize)
     plt.savefig('dendogram_'+'Valor'+'.png')
-    st.pyplot()
+    st.subheader("Dendograma")
+    #mostrar una imagen
+    st.image('dendogram_'+'Valor'+'.png')
     #plot sample correlations
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,4), sharey=True)
     plt.subplots_adjust(wspace=0.05)
@@ -125,5 +137,6 @@ def app():
     ax2.plot(returns[sB],label=sB)
     ax2.set_title('Correlación de caracteristicas = %.3f'%corr[sA][sB])
     ax2.legend(loc='upper left',prop={'size':8})
-    plt.setp(ax2.get_xticklabels(), rotation=70);
-    st.pyplot()
+    plt.setp(ax2.get_xticklabels(), rotation=70)
+    plt.subheader("Correlación de caracteristicas")
+    st.pyplot(f)
