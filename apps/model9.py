@@ -108,6 +108,8 @@ def app():
 
     # Get the models predicted price values 
     # Obtenga los valores de precios predichos de los modelos
+    #convertir x_test en un valor de tensor
+    x_test = tf.convert_to_tensor(x_test)
     predictions = model.predict(x_test)
     predictions = scaler.inverse_transform(predictions)
 
