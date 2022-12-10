@@ -6,6 +6,7 @@ from tensorflow.keras.models import load_model
 import streamlit as st
 from sklearn import metrics
 import plotly.express as px
+import tensorflow as tf
 
 
 def app():
