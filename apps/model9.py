@@ -33,6 +33,7 @@ def app():
     # con la libreria de pandas_datareader podemos obtener informacion de la empresa
     st.subheader('Acerca de la empresa')
     st.write(datas.get_quote_yahoo(user_input))
+    st.subheader('Datos de la empresa')
     st.write(dfi)
 
     #separar el dataframe en train y test
