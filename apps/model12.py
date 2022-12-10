@@ -60,6 +60,7 @@ def app():
     pca_data =pca.fit(returns)
     # Plot the cumulative sum of the explained variance ratio in pyplot
     st.subheader("Explained Variance Ratio")
+    
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(np.cumsum(pca.explained_variance_ratio_))
