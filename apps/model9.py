@@ -26,18 +26,14 @@
 
 #     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
 #     dfi = datas.DataReader(user_input, 'yahoo', start, end)
-#     #renombra la columna de datetimne como Date
-#     dfi = dfi.reset_index()
-#     dfi = dfi.rename(columns={'Date':'Date'})
 #     #escribir un poco acerca de la empresa introducida en user_input
 #     # con la libreria de pandas_datareader podemos obtener informacion de la empresa
 #     st.subheader('Acerca de la empresa')
 #     st.write(datas.get_quote_yahoo(user_input))
-#     dfi.reset_index(inplace=True)
-#     dfi.set_index("Date", inplace=True)
+#     st.write(dfi)
 
 #     #hacemos un grafico de la serie de tiempo
 #     st.subheader('Serie de tiempo de la cotización bursátil de '+user_input)
-#     fig = px.line(dfi, x="Date", y="Close", title='Precio de cierre de '+ user_input)
+#     fig = px.line(dfi, x=dfi.index , y="Close", title='Precio de cierre de '+ user_input)
 #     st.plotly_chart(fig)
 

@@ -13,7 +13,7 @@ st.markdown("""
 app.add_app("Home", home.app)
 # app.add_app("Modelo SVR", model1.app)
 # app.add_app("PCA and Hierarchical Portfolio Optimisation", model12.app)
-app.add_app("Modelo LSTM", model9.app)
+# app.add_app("Modelo LSTM", model9.app)
 app.add_app("Modelo XGBoost", model10.app)
 app.add_app("Modelo Random Forest Regressor", model11.app)
 app.add_app("PCA and Hierarchical Portfolio Optimisation", model12.app)
