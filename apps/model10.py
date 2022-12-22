@@ -23,9 +23,9 @@ def app():
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
     # convertir user_input en una lista
-    user_input = [user_input]
+    user_inputq = [user_input]
 
-    df = pdr.get_data_yahoo(symbols=user_input, start=start, end=end)
+    df = pdr.get_data_yahoo(user_inputq, start=start, end=end)
     #renombra la columna de datetimne como Date
     df = df.reset_index()
     df = df.rename(columns={'Date':'Date'})
