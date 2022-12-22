@@ -14,13 +14,15 @@ def app():
 
     start = st.date_input('Inicio',value=pd.to_datetime('2017-11-28'))
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
+    start = pd.to_datetime(start)
+    end = pd.to_datetime(end)
 
     # startStr = start.strftime('%Y-%m-%d')
     # endStr = end.strftime('%Y-%m-%d')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
    
-    df = pdr.get_data_yahoo([user_input], start,end)
+    df = pdr.get_data_yahoo(symbols=user_input, start=start, end=end)
 
     #mostra los datos
     st.write(df)

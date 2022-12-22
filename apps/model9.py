@@ -25,11 +25,13 @@ def app():
 
     start = st.date_input('Inicio(Start)',value=pd.to_datetime('2010-01-01'))
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
+    start = pd.to_datetime(start)
+    end = pd.to_datetime(end)
     
     st.title('Predicción de tendencia de acciones usando LSTM')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
-    dfi = pdr.get_data_yahoo([user_input], start,end)
+    dfi = pdr.get_data_yahoo(symbols=user_input, start=start, end=end)
     #escribir un poco acerca de la empresa introducida en user_input
     # con la libreria de pandas_datareader podemos obtener informacion de la empresa
     st.subheader('Acerca de la empresa')

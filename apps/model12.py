@@ -19,11 +19,12 @@ def app():
     st.title('Modelo PCA and Hierarchical Portfolio Optimisation')
     start = st.date_input('Start' , value=pd.to_datetime('2000-01-01'))
     end = st.date_input('End' , value=pd.to_datetime('today'))
-
+    start = pd.to_datetime(start)
+    end = pd.to_datetime(end)
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
 
-    df = pdr.get_data_yahoo([user_input], start,end)
+    df = pdr.get_data_yahoo(symbols=user_input, start=start, end=end)
     st.subheader('Datos del 2000 al 2022') 
     st.write(df.describe())
     #Visualizaciones 
