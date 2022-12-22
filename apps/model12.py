@@ -23,8 +23,7 @@ def app():
     end = pd.to_datetime(end)
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
-    user_inputq = [user_input]
-    df = pdr.get_data_yahoo(user_inputq, start=start, end=end)
+    df = pdr.get_data_yahoo([user_input], start, end)
     st.subheader('Datos del 2000 al 2022') 
     st.write(df.describe())
     #Visualizaciones 

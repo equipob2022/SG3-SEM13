@@ -31,8 +31,9 @@ def app():
     st.title('Predicción de tendencia de acciones usando LSTM')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
+    #tipo de variable de user_input
     user_inputq = [user_input]
-    dfi = pdr.get_data_yahoo(user_inputq, start=start, end=end)
+    dfi = pdr.get_data_yahoo([user_input], start, end)
     #escribir un poco acerca de la empresa introducida en user_input
     # con la libreria de pandas_datareader podemos obtener informacion de la empresa
     st.subheader('Acerca de la empresa')

@@ -21,8 +21,7 @@ def app():
     # endStr = end.strftime('%Y-%m-%d')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
-    user_inputq = [user_input]
-    df = pdr.get_data_yahoo(user_inputq, start=start, end=end)
+    df = pdr.get_data_yahoo([user_input], start, end)
 
     #mostra los datos
     st.write(df)
