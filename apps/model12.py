@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-import yfinance as yf
 import pandas_datareader as datas
 from scipy.cluster.hierarchy import ward, dendrogram, linkage,cophenet
 import matplotlib.cm as cm
