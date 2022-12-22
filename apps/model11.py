@@ -7,6 +7,7 @@ import pandas_datareader as datas
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import ParameterGrid
 from sklearn import metrics
+from pandas_datareader import data as pdr
 
 def app():
     st.title('Random Forest Prediccion del Doge coin')
@@ -14,12 +15,12 @@ def app():
     start = st.date_input('Inicio',value=pd.to_datetime('2017-11-28'))
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
 
-    startStr = start.strftime('%Y-%m-%d')
-    endStr = end.strftime('%Y-%m-%d')
+    # startStr = start.strftime('%Y-%m-%d')
+    # endStr = end.strftime('%Y-%m-%d')
 
-    user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-USD')
+    user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
    
-    df = datas.DataReader(user_input, 'yahoo', start, end)
+    df = pdr.get_data_yahoo([user_input], start,end)
 
     #mostra los datos
     st.write(df)
@@ -76,56 +77,57 @@ def app():
     n_estimators = st.number_input('Numero de arboles', min_value=1, max_value=1000, value=100, step=1)
     max_depth = st.number_input('Profundidad maxima', min_value=1, max_value=100, value=5, step=1)
     random_state = st.number_input('Semilla', min_value=1, max_value=100, value=2, step=1)
+    with st.spinner('Haciendo predicciones 🔮🔮🔮...'):
+        #definimos el modelo
+        rf_model = RandomForestRegressor(
+            n_estimators=n_estimators, 
+            max_depth=max_depth, 
+            random_state=random_state
+        )
 
-    #definimos el modelo
-    rf_model = RandomForestRegressor(
-        n_estimators=n_estimators, 
-        max_depth=max_depth, 
-        random_state=random_state
-    )
+        rf_model.fit(X_train, y_train)
 
-    rf_model.fit(X_train, y_train)
-
-    y_pred = rf_model.predict(X_test)
-    # crear un dataframe con los valores reales , los predichos y la fecha
-    st.subheader('Valores reales vs predichos')
-    df_pred = pd.DataFrame({'y_test':y_test, 'y_pred':y_pred}, index=y_test.index)
-    st.write(df_pred)
-
-
-    #hacer un grafico de la prediccion vs el valor real
-    st.subheader('Prediccion con Random Forest')
-    fig = px.line(df_pred, title='Prediccion con Random Forest')
-    st.plotly_chart(fig)
+        y_pred = rf_model.predict(X_test)
+        # crear un dataframe con los valores reales , los predichos y la fecha
+        st.subheader('Valores reales vs predichos')
+        df_pred = pd.DataFrame({'y_test':y_test, 'y_pred':y_pred}, index=y_test.index)
+        st.write(df_pred)
 
 
-    ## Métricas
-    MAE=metrics.mean_absolute_error(y_test, y_pred)
-    MSE=metrics.mean_squared_error(y_test, y_pred)
-    RMSE=np.sqrt(metrics.mean_squared_error(y_test, y_pred))
-    metricas = {
-        'metrica' : ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error'],
-        'valor': [MAE, MSE, RMSE]
-    }
-    metricas = pd.DataFrame(metricas)
+        #hacer un grafico de la prediccion vs el valor real
+        st.subheader('Prediccion con Random Forest')
+        fig = px.line(df_pred, title='Prediccion con Random Forest')
+        st.plotly_chart(fig)
 
-    ### Gráfica de las métricas
-    st.subheader('Métricas de rendimiento')
-    
-    st.write(pd.DataFrame(
-        data = [MSE, MAE, RMSE],
-        index = ["MSE", "MAE", "MAPE"],
-        columns = ["Error"]
-    ))
 
-    fig = px.bar(        
-        metricas,
-        x = "metrica",
-        y = "valor",
-        title = "Métricas del Modelo Random Forest Regressor",
-        color="metrica"
-    )
-    st.plotly_chart(fig)
+        ## Métricas
+        MAE=metrics.mean_absolute_error(y_test, y_pred)
+        MSE=metrics.mean_squared_error(y_test, y_pred)
+        RMSE=np.sqrt(metrics.mean_squared_error(y_test, y_pred))
+        metricas = {
+            'metrica' : ['Mean Absolute Error', 'Mean Squared Error', 'Root Mean Squared Error'],
+            'valor': [MAE, MSE, RMSE]
+        }
+        metricas = pd.DataFrame(metricas)
+
+        ### Gráfica de las métricas
+        st.subheader('Métricas de rendimiento')
+        
+        st.write(pd.DataFrame(
+            data = [MSE, MAE, RMSE],
+            index = ["MSE", "MAE", "MAPE"],
+            columns = ["Error"]
+        ))
+
+        fig = px.bar(        
+            metricas,
+            x = "metrica",
+            y = "valor",
+            title = "Métricas del Modelo Random Forest Regressor",
+            color="metrica"
+        )
+        st.plotly_chart(fig)
+        st.success('¡Listo😁!')
 
     
     

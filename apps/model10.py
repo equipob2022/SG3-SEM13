@@ -5,32 +5,29 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-import pandas_datareader as datas
+from pandas_datareader import data as pdr
 import matplotlib.pyplot as plt
 
 
 def app():
     #start = '2004-08-18'
     #end = '2022-01-20'
-    start = st.date_input('Inicio(Start)',value=pd.to_datetime('2010-01-01'))
-    end = st.date_input('Fin' , value=pd.to_datetime('today'))
+    start = st.date_input('Start' , value=pd.to_datetime('2014-08-18'))
+    end = st.date_input('End' , value=pd.to_datetime('today'))
     
-    st.title('Predicción de tendencia de acciones')
-    st.write('Este modelo utiliza el algoritmo XGBoost para predecir la tendencia de las acciones')
-    #describir el modelo y sus caracteristicas
-    st.subheader('Descripción del modelo')
+    st.title('Predicción de tendencia de acciones usando XGBoost')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
-    startStr = start.strftime('%Y-%m-%d')
-    endStr = end.strftime('%Y-%m-%d')
-    df = datas.DataReader(user_input, 'yahoo', start, end)
+
+
+    df = pdr.get_data_yahoo([user_input], start,end)
     #renombra la columna de datetimne como Date
     df = df.reset_index()
     df = df.rename(columns={'Date':'Date'})
     #escribir un poco acerca de la empresa introducida en user_input
     # con la libreria de pandas_datareader podemos obtener informacion de la empresa
     st.subheader('Acerca de la empresa')
-    st.write(datas.get_quote_yahoo(user_input))
+    st.write(pdr.get_quote_yahoo(user_input))
 
     #hacemos un grafico de la serie de tiempo
     st.subheader('Serie de tiempo de la cotización bursátil de '+user_input)
@@ -44,8 +41,11 @@ def app():
 
     # añadir columna Dayli Return%
     df['Daily Return %'] = (df['Adj Close'] / df['Adj Close'].shift(1)) - 1
+    # crear dos variables startstr y endstr para ponerlas en el titulo
+    startstr = start.strftime('%Y-%m-%d')
+    endstr = end.strftime('%Y-%m-%d')
     #mostramos los datos
-    st.subheader('Datos del '+ startStr +' al '+endStr)
+    st.subheader('Datos del '+ startstr +' al '+endstr)
     st.write(df)
 
     # Separar Date en Year, Month, Day
@@ -88,102 +88,103 @@ def app():
         learning_rate = learning_rate,
     )
     bar.progress(10)
+    with st.spinner('Haciendo predicciones 🔮🔮🔮...'):
+        model.fit(
+            x_train,
+            y_train,
+            eval_set = [(x_train, y_train), (x_eval, y_eval)],
+            early_stopping_rounds = 20,
+            verbose = False
+        )
+        bar.progress(50)
 
-    model.fit(
-        x_train,
-        y_train,
-        eval_set = [(x_train, y_train), (x_eval, y_eval)],
-        early_stopping_rounds = 20,
-        verbose = False
-    )
-    bar.progress(50)
+        #mostramos la importancia de las variables
+        st.subheader('Importancia de las variables')
+        #imprimir como una tabla la importancia de las variables
+        st.write(pd.DataFrame(model.feature_importances_, index=x_train.columns, columns=["Importancia"]).sort_values(by="Importancia", ascending=False))
 
-    #mostramos la importancia de las variables
-    st.subheader('Importancia de las variables')
-    #imprimir como una tabla la importancia de las variables
-    st.write(pd.DataFrame(model.feature_importances_, index=x_train.columns, columns=["Importancia"]).sort_values(by="Importancia", ascending=False))
+        bar.progress(100)
 
-    bar.progress(100)
+        # evaluar el modelo
+        # Crear un dataframe final para verificar las predicciones
+        df_pred = x_eval.copy()
 
-    # evaluar el modelo
-    # Crear un dataframe final para verificar las predicciones
-    df_pred = x_eval.copy()
+        # Recrear una columna para la fecha completa y ponerla como primer columna
+        date_columns = ["Year", "Month", "Day"]
+        df_pred["Date"] = df_pred[date_columns].apply(
+            lambda x: "-".join(x.values.astype(str)),
+            axis = 1
+        )
 
-    # Recrear una columna para la fecha completa y ponerla como primer columna
-    date_columns = ["Year", "Month", "Day"]
-    df_pred["Date"] = df_pred[date_columns].apply(
-        lambda x: "-".join(x.values.astype(str)),
-        axis = 1
-    )
-
-    # Predecir datos para el conjunto de datos de evaluación y 
-    # guardar el Adj Close predicho como una nueva columna
-    df_pred["Adj Close_Pred"] = model.predict(x_eval)
-    # pasar la columa Date a la primera posicion
-
-
+        # Predecir datos para el conjunto de datos de evaluación y 
+        # guardar el Adj Close predicho como una nueva columna
+        df_pred["Adj Close_Pred"] = model.predict(x_eval)
+        # pasar la columa Date a la primera posicion
 
 
-    # Usamos merge para combinar los datos de evaluación con los datos de predicción
-    df_pred = df_pred.merge(
-        y_eval, 
-        how = "inner", 
-        left_index = True, 
-        right_index = True
-    )
 
-    # Mostrar los datos de predicción
-    st.subheader('Datos de predicción')
-    st.write(df_pred)
 
-    # Graficar los datos de predicción
-    st.subheader('Gráfico de predicción')
-    # Graficar los datos de predicción vs los datos de evaluación
-    title = "Predicción de precios de cierre de "+ user_input
-    fig = px.line(
-        df_pred,
-        x = "Date",
-        y = ["Adj Close", "Adj Close_Pred"],
-        title = title
-    )
-    st.plotly_chart(fig)
+        # Usamos merge para combinar los datos de evaluación con los datos de predicción
+        df_pred = df_pred.merge(
+            y_eval, 
+            how = "inner", 
+            left_index = True, 
+            right_index = True
+        )
 
-    # evaluar el modelo
-    mse = mean_squared_error(
-    y_true = df_pred["Adj Close"],
-    y_pred = df_pred["Adj Close_Pred"]
-    )
-    mae = mean_absolute_error(
+        # Mostrar los datos de predicción
+        st.subheader('Datos de predicción')
+        st.write(df_pred)
+
+        # Graficar los datos de predicción
+        st.subheader('Gráfico de predicción')
+        # Graficar los datos de predicción vs los datos de evaluación
+        title = "Predicción de precios de cierre de "+ user_input
+        fig = px.line(
+            df_pred,
+            x = "Date",
+            y = ["Adj Close", "Adj Close_Pred"],
+            title = title
+        )
+        st.plotly_chart(fig)
+
+        # evaluar el modelo
+        mse = mean_squared_error(
         y_true = df_pred["Adj Close"],
         y_pred = df_pred["Adj Close_Pred"]
-    )
-    # Mean Absolute Percentage Error is the percentage of how off the predicted values are
-    mape = (
-        np.abs(df_pred["Adj Close"] - df_pred["Adj Close_Pred"]) / df_pred["Adj Close"]
-    ).mean() * 100
+        )
+        mae = mean_absolute_error(
+            y_true = df_pred["Adj Close"],
+            y_pred = df_pred["Adj Close_Pred"]
+        )
+        # Mean Absolute Percentage Error is the percentage of how off the predicted values are
+        mape = (
+            np.abs(df_pred["Adj Close"] - df_pred["Adj Close_Pred"]) / df_pred["Adj Close"]
+        ).mean() * 100
 
-    # Mostrar los errores en un gráfico 
-    st.subheader('Gráfico de errores')
-    # Graficar los errores
-    title = "Errores de predicción de precios de cierre de "+ user_input
-    fig = px.bar(
-        x = ["MSE", "MAE", "MAPE"],
-        y = [mse, mae, mape],
-        title = title
-    )
-    st.plotly_chart(fig)
+        # Mostrar los errores en un gráfico 
+        st.subheader('Gráfico de errores')
+        # Graficar los errores
+        title = "Errores de predicción de precios de cierre de "+ user_input
+        fig = px.bar(
+            x = ["MSE", "MAE", "MAPE"],
+            y = [mse, mae, mape],
+            title = title
+        )
+        st.plotly_chart(fig)
 
-    # Mostrar los errores en una tabla de streamlit
-    st.subheader('Metricas de error')
-    st.write(pd.DataFrame(
-        data = [mse, mae, mape],
-        index = ["MSE", "MAE", "MAPE"],
-        columns = ["Error"]
-    ))
-    #explicando que es cada error y un poco de teoria
-    st.write('''
-    * **MSE** (Mean Squared Error): Es la media de los errores al cuadrado. Es una medida de la varianza de los errores. Cuanto menor sea el MSE, mejor será el modelo.
-    * **MAE** (Mean Absolute Error): Es la media de los valores absolutos de los errores. Es una medida de la dispersión de los errores. Cuanto menor sea el MAE, mejor será el modelo.
-    * **MAPE** (Mean Absolute Percentage Error): Es la media de los porcentajes de los errores. Es una medida de la dispersión de los errores. Cuanto menor sea el MAPE, mejor será el modelo.
-    ''')
+        # Mostrar los errores en una tabla de streamlit
+        st.subheader('Metricas de error')
+        st.write(pd.DataFrame(
+            data = [mse, mae, mape],
+            index = ["MSE", "MAE", "MAPE"],
+            columns = ["Error"]
+        ))
+        #explicando que es cada error y un poco de teoria
+        st.write('''
+        * **MSE** (Mean Squared Error): Es la media de los errores al cuadrado. Es una medida de la varianza de los errores. Cuanto menor sea el MSE, mejor será el modelo.
+        * **MAE** (Mean Absolute Error): Es la media de los valores absolutos de los errores. Es una medida de la dispersión de los errores. Cuanto menor sea el MAE, mejor será el modelo.
+        * **MAPE** (Mean Absolute Percentage Error): Es la media de los porcentajes de los errores. Es una medida de la dispersión de los errores. Cuanto menor sea el MAPE, mejor será el modelo.
+        ''')
+        st.success('¡Listo! 🎉🎉🎉')
 

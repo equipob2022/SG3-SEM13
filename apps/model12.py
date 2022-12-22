@@ -14,16 +14,17 @@ import pandas_datareader as datas
 from scipy.cluster.hierarchy import ward, dendrogram, linkage,cophenet
 import matplotlib.cm as cm
 from scipy.spatial.distance import pdist
+from pandas_datareader import data as pdr
 import pylab
 def app():    
-    st.title('Modelo 12 - PCA and Hierarchical Portfolio Optimisation')
+    st.title('Modelo PCA and Hierarchical Portfolio Optimisation')
     start = st.date_input('Start' , value=pd.to_datetime('2000-01-01'))
     end = st.date_input('End' , value=pd.to_datetime('today'))
 
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
 
-    df = datas.DataReader(user_input, 'yahoo', start, end)
+    df = pdr.get_data_yahoo([user_input], start,end)
     st.subheader('Datos del 2000 al 2022') 
     st.write(df.describe())
     #Visualizaciones 
