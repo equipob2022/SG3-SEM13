@@ -13,7 +13,7 @@ import yfinance as yf
 
 def app():
     yf.pdr_override()
-    st.title('Random Forest Prediccion del Doge coin')
+    st.title('Random Forest Prediccion del precio de las acciones')
 
     start = st.date_input('Inicio',value=pd.to_datetime('2017-11-28'))
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
@@ -130,7 +130,17 @@ def app():
             color="metrica"
         )
         st.plotly_chart(fig)
-        st.success('¡Listo😁!')
+        #mostrar el precio de la accion mañana
+        st.subheader('Precio de la accion para mañana:')
+        #predecir el precio de la accion para mañana
+        tomorrow_price = rf_model.predict(X_test[-1:].values)
+        #convertir tomorrows_price a un string
+        tomorrow_price = str(tomorrow_price)
+        #concatenar el simbolo de la moneda
+        tomorrow_price = tomorrow_price + '🪙'
+        st.subheader(tomorrow_price)
+
+        st.success('¡Listo 😁!')
 
     
     

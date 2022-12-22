@@ -188,5 +188,15 @@ def app():
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=['MSE', 'MAE', 'R2'], y=[mean_squared_error(org_y, predicted_y), mean_absolute_error(org_y, predicted_y), r2_score(org_y, predicted_y)], name='Metricas'))
         st.plotly_chart(fig)
+
+        #mostrar el precio de la accion mañana
+        st.subheader('Precio de la accion para mañana:')
+        #predecir el precio de la accion para mañana
+        tomorrow_price = model.predict(X_test[-1].reshape(1,36,1))
+        #convertir tomorrows_price a un string
+        tomorrow_price = str(tomorrow_price)
+        #concatenar el simbolo de la moneda
+        tomorrow_price = tomorrow_price + '🪙'
+        st.subheader(tomorrow_price)
         st.success('Modelo cargado!')
  

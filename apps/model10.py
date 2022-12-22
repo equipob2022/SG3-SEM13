@@ -187,5 +187,16 @@ def app():
         * **MAE** (Mean Absolute Error): Es la media de los valores absolutos de los errores. Es una medida de la dispersión de los errores. Cuanto menor sea el MAE, mejor será el modelo.
         * **MAPE** (Mean Absolute Percentage Error): Es la media de los porcentajes de los errores. Es una medida de la dispersión de los errores. Cuanto menor sea el MAPE, mejor será el modelo.
         ''')
+        #mostrar el precio de la accion mañana
+        st.subheader('Precio de la accion para mañana:')
+        #hallar el ultimo dia de la serie de tiempo
+        last_day = df_pred['Date'].iloc[-1]
+        #predecir el precio de la accion para mañana
+        tomorrow_price = model.predict(x_eval.iloc[-1].values.reshape(1, -1))
+        #convertir tomorrows_price a un string
+        tomorrow_price = str(tomorrow_price)
+        #concatenar el simbolo de la moneda
+        tomorrow_price = tomorrow_price + '🪙'
+        st.subheader(tomorrow_price)
         st.success('¡Listo! 🎉🎉🎉')
 
