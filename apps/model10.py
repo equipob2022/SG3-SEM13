@@ -7,6 +7,7 @@ import plotly.express as px
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from pandas_datareader import data as pdr
 import matplotlib.pyplot as plt
+import yfinance as yf
 
 
 def app():

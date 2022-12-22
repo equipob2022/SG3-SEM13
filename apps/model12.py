@@ -15,6 +15,8 @@ import matplotlib.cm as cm
 from scipy.spatial.distance import pdist
 from pandas_datareader import data as pdr
 import pylab
+import yfinance as yf
+
 def app():    
     st.title('Modelo PCA and Hierarchical Portfolio Optimisation')
     start = st.date_input('Start' , value=pd.to_datetime('2000-01-01'))

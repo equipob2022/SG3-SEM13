@@ -8,6 +8,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import ParameterGrid
 from sklearn import metrics
 from pandas_datareader import data as pdr
+import yfinance as yf
+
 
 def app():
     st.title('Random Forest Prediccion del Doge coin')

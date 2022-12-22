@@ -19,7 +19,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import plotly.graph_objects as go
 from pandas_datareader import data as pdr
-
+import yfinance as yf
 
 def app():
 
