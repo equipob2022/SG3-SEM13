@@ -15,6 +15,10 @@ def app():
     start = st.date_input('Start' , value=pd.to_datetime('2014-08-18'))
     end = st.date_input('End' , value=pd.to_datetime('today'))
     
+
+    #convertir la fecha en formato datetime
+    start = pd.to_datetime(start)
+    end = pd.to_datetime(end)
     st.title('Predicción de tendencia de acciones usando XGBoost')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
