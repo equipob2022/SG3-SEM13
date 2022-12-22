@@ -22,17 +22,15 @@ from pandas_datareader import data as pdr
 import yfinance as yf
 
 def app():
-
+    yf.pdr_override()
     start = st.date_input('Inicio(Start)',value=pd.to_datetime('2010-01-01'))
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
-    start = pd.to_datetime(start)
-    end = pd.to_datetime(end)
+
     
     st.title('Predicción de tendencia de acciones usando LSTM')
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
     #tipo de variable de user_input
-    user_inputq = [user_input]
     dfi = pdr.get_data_yahoo([user_input], start, end)
     #escribir un poco acerca de la empresa introducida en user_input
     # con la libreria de pandas_datareader podemos obtener informacion de la empresa

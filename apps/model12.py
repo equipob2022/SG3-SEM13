@@ -17,12 +17,12 @@ from pandas_datareader import data as pdr
 import pylab
 import yfinance as yf
 
-def app():    
+def app():
+    yf.pdr_override()    
     st.title('Modelo PCA and Hierarchical Portfolio Optimisation')
     start = st.date_input('Start' , value=pd.to_datetime('2000-01-01'))
     end = st.date_input('End' , value=pd.to_datetime('today'))
-    start = pd.to_datetime(start)
-    end = pd.to_datetime(end)
+
 
     user_input = st.text_input('Introducir cotización bursátil' , 'DOGE-EUR')
     df = pdr.get_data_yahoo([user_input], start, end)

@@ -12,12 +12,12 @@ import yfinance as yf
 
 
 def app():
+    yf.pdr_override()
     st.title('Random Forest Prediccion del Doge coin')
 
     start = st.date_input('Inicio',value=pd.to_datetime('2017-11-28'))
     end = st.date_input('Fin' , value=pd.to_datetime('today'))
-    start = pd.to_datetime(start)
-    end = pd.to_datetime(end)
+
 
     # startStr = start.strftime('%Y-%m-%d')
     # endStr = end.strftime('%Y-%m-%d')
